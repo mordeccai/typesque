@@ -1,0 +1,25 @@
+{
+  "name": "typesque",
+  "version": "0.1.0",
+  "description": "The express framework powered by typescript",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "typesque": "bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mordeccai/typesque.git"
+  },
+  "author": "Tito Mordeccai Mitto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mordeccai/typesque/issues"
+  },
+  "homepage": "https://github.com/mordeccai/typesque#readme",
+  "dependencies": {
+    "commander": "^2.19.0"
+  }
+}
