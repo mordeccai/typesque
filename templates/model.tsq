@@ -1,0 +1,17 @@
+import { Model, Table, Column, UpdatedAt, CreatedAt } from 'sequelize-typescript';
+
+@Table({
+    timestamps: true,
+    tableName: "$$tableName$$"
+})
+class $$modelName$$ extends Model<$$modelName$$> {
+
+    @CreatedAt
+    created_at: Date
+
+    @UpdatedAt
+    @Column({allowNull: true})
+    updated_at: Date
+}
+
+export default $$modelName$$;
