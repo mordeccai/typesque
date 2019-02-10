@@ -2,6 +2,7 @@ import _ from 'lodash';
 import chalk from 'chalk';
 import pluralize from 'pluralize';
 import fs from 'fs-extra';
+import path from 'path';
 
 export function isAcceptedName(name: string, type: string=""){
     name = name.replace(new RegExp(type, "gi"), "")
@@ -46,4 +47,13 @@ export function getFormattedName(name: string, cmd: any, type: any="", appendTyp
     }
     
     return name;
+}
+
+export async function isTypesqueProject(){
+    let currentPath = path.join(process.cwd(), 'typesque.json');
+    if(await fs.pathExists(currentPath)) {
+        return true;
+    }else{
+        return false;
+    }
 }
