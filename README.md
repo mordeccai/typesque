@@ -6,12 +6,7 @@ This repo contains the core modules for the Typesque framework.
 <hr />
 <br />
 
-[![NPM Version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Appveyor][appveyor-image]][appveyor-url]
-[![Coveralls][coveralls-image]][coveralls-url]
-[![FOSSA Status][fossa-image]][fossa-url]
-[![Pr's Welcome][pr-welcoming-image]][pr-welcoming-url]
+[![npm version](https://badge.fury.io/js/typesque.svg)](https://badge.fury.io/js/typesque)
 
 <img src="typesque_logo.png" width="200px" align="right" hspace="30px" vspace="140px">
 
