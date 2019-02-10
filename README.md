@@ -8,11 +8,19 @@ This repo contains the core modules for the Typesque framework.
 
 [![npm version](https://badge.fury.io/js/typesque.svg)](https://badge.fury.io/js/typesque)
 
-<img src="typesque_logo.png" width="200px" align="right" hspace="30px" vspace="140px">
-
 ## Node/OS Target
 
 This repo/branch is supposed to run fine on all major OS platforms and targets `Node.js >= 8.0.0`
+
+# Installation
+Install the cli is a command away just run the good old npm install
+```
+npm install -g typesque
+```
+
+
+<img src="typesque_logo.png" width="200px" align="right" hspace="30px" vspace="140px">
+
 
 ## Cli Commands
 
