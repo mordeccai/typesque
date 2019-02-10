@@ -19,6 +19,14 @@ Typesque is a framework with cli.
 
 This repo/branch is supposed to run fine on all major OS platforms and targets `Node.js >= 8.0.0`
 
+## Cli Commands
+
+You can either use `typesque` or `tsq`. I'll use the 
+Create a new project `tsq new project-name`
+Create a controller `tsq make:controller home-controller` or even shorter `tsq make:controller home`
+Create a model `tsq make:model home`
+Create a middleware `tsq make:middleware is-home`
+
 ## Development
 
 Great! If you are planning to contribute to the framework, make sure to adhere to following conventions, since a consistent code-base is always joy to work with.
