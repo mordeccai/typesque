@@ -1,22 +1,5 @@
-import {Request, Response} from 'express';
+import {Request, Response, NextFunction} from 'express';
 
-export class $$ControllerName$$ {
-    static async index(req: Request, res: Response){
-    }
-
-    static async store(req: Request, res: Response){
-
-    }
-
-    static async show(req: Request, res: Response){
-
-    }
-
-    static async update(req: Request, res: Response){
-    }
-
-    static async destroy(req: Request, res: Response){
-    }
+export const $$middlewareName$$ = async (req: Request, res: Response, next: NextFunction )=>{
+    next();
 }
-
-export default $$ControllerName$$;
