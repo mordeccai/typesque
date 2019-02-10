@@ -21,6 +21,8 @@ export async function destinationExists(destinationFile: string): Promise<boolea
         console.error(`${chalk.bgRed(" ERROR ")} ${destinationFile} already exists`)
         return true;
     } else {
+        console.log("PATH :"+ path.join(destinationFile, ".."))
+        await fs.promises.mkdir(path.join(destinationFile, ".."), { recursive: true });
         return false;
     }
 }

@@ -42,6 +42,7 @@ var lodash_1 = __importDefault(require("lodash"));
 var chalk_1 = __importDefault(require("chalk"));
 var pluralize_1 = __importDefault(require("pluralize"));
 var fs_extra_1 = __importDefault(require("fs-extra"));
+var path_1 = __importDefault(require("path"));
 function isAcceptedName(name, type) {
     if (type === void 0) { type = ""; }
     name = name.replace(new RegExp(type, "gi"), "");
@@ -62,14 +63,15 @@ function destinationExists(destinationFile) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, fs_extra_1.default.pathExists(destinationFile)];
                 case 1:
-                    if (_a.sent()) {
-                        console.error(chalk_1.default.bgRed(" ERROR ") + " " + destinationFile + " already exists");
-                        return [2 /*return*/, true];
-                    }
-                    else {
-                        return [2 /*return*/, false];
-                    }
-                    return [2 /*return*/];
+                    if (!_a.sent()) return [3 /*break*/, 2];
+                    console.error(chalk_1.default.bgRed(" ERROR ") + " " + destinationFile + " already exists");
+                    return [2 /*return*/, true];
+                case 2:
+                    console.log("PATH :" + path_1.default.join(destinationFile, ".."));
+                    return [4 /*yield*/, fs_extra_1.default.promises.mkdir(path_1.default.join(destinationFile, ".."), { recursive: true })];
+                case 3:
+                    _a.sent();
+                    return [2 /*return*/, false];
             }
         });
     });
@@ -103,3 +105,24 @@ function getFormattedName(name, cmd, type, appendType) {
     return name;
 }
 exports.getFormattedName = getFormattedName;
+function isTypesqueProject() {
+    return __awaiter(this, void 0, void 0, function () {
+        var currentPath;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    currentPath = path_1.default.join(process.cwd(), 'typesque.json');
+                    return [4 /*yield*/, fs_extra_1.default.pathExists(currentPath)];
+                case 1:
+                    if (_a.sent()) {
+                        return [2 /*return*/, true];
+                    }
+                    else {
+                        return [2 /*return*/, false];
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.isTypesqueProject = isTypesqueProject;

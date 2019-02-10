@@ -53,7 +53,8 @@ var path = __importStar(require("path"));
 var chalk_1 = __importDefault(require("chalk"));
 var fs_extra_1 = __importDefault(require("fs-extra"));
 var main_1 = require("../main");
-var ora = require('ora');
+var ora_1 = __importDefault(require("ora"));
+var npm_programmatic_1 = __importDefault(require("npm-programmatic"));
 commander_1.default
     .version('0.1.0', '-v --version')
     .description('A node framework on top of express with superpowers');
@@ -76,16 +77,69 @@ commander_1.default
     .description('Make a middleware')
     .action(makeMiddleware);
 commander_1.default
-    .command('make:ehandler <name>')
-    .action(makeEHandler);
+    .command('serve')
+    .description('Serve project')
+    .option('-d --dev', 'Serve dev version')
+    .action(serve);
+/*   program
+  .command('make:ehandler <name>')
+  .action(makeEHandler) */
 commander_1.default.parse(process.argv);
 function newProject(name, cmd) {
-    var git = require('simple-git/promise')(process.cwd()).silent(true);
-    var spinner = ora('Creating project').start('Cloning project blueprint');
-    git.clone('https://github.com/mordeccai/sequelize-typescript-api-starter.git', name).then(function () {
-        spinner.succeed("Project " + chalk_1.default.green(name) + " created successfully");
-    }).catch(function (err) {
-        spinner.fail('Failed to load clone the project. Please check your connection');
+    return __awaiter(this, void 0, void 0, function () {
+        var projectName, git, spinner;
+        var _this = this;
+        return __generator(this, function (_a) {
+            name = main_1.getFormattedName(name, cmd);
+            projectName = name.split(/(?=[A-Z])|\-/g);
+            projectName[projectName.length - 1] = projectName[projectName.length - 1];
+            name = projectName.join('-').toLowerCase();
+            git = require('simple-git/promise')(process.cwd()).silent(true);
+            spinner = ora_1.default('Creating project').start('Generating project blueprint');
+            git.clone('https://github.com/mordeccai/sequelize-typescript-api-starter.git', name).then(function () { return __awaiter(_this, void 0, void 0, function () {
+                var packageJsonFilePath, packageJSON, _a, _b;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0: return [4 /*yield*/, fs_extra_1.default.remove(path.join(process.cwd(), name, '.git'))];
+                        case 1:
+                            _c.sent();
+                            spinner.start("Configuring project");
+                            packageJsonFilePath = path.join(process.cwd(), name, 'package.json');
+                            _b = (_a = JSON).parse;
+                            return [4 /*yield*/, fs_extra_1.default.readFile(packageJsonFilePath, 'utf-8')];
+                        case 2:
+                            packageJSON = _b.apply(_a, [_c.sent()]);
+                            packageJSON["name"] = name;
+                            spinner.start("Copying " + chalk_1.default.blue(".env") + " file");
+                            return [4 /*yield*/, fs_extra_1.default.copy(path.join(process.cwd(), name, '.env.example'), path.join(process.cwd(), name, '.env'))];
+                        case 3:
+                            _c.sent();
+                            return [4 /*yield*/, fs_extra_1.default.writeFile(packageJsonFilePath, JSON.stringify(packageJSON, null, 4))];
+                        case 4:
+                            _c.sent();
+                            spinner.start("Installing project packages");
+                            npm_programmatic_1.default.install([''], {
+                                cwd: path.join(process.cwd(), name),
+                                save: true
+                            })
+                                .then(function () {
+                                spinner.succeed("Packages installed successfuly");
+                                spinner.succeed("Project " + chalk_1.default.green(name) + " created successfully");
+                                console.log("Development (With watch) " + chalk_1.default.blue("npm run start:dev") + " \nProd (Without watch) " + chalk_1.default.blue("npm run start") + " instead");
+                            })
+                                .catch(function () {
+                                spinner.fail("Unable to install packages");
+                                spinner.succeed("Project " + chalk_1.default.green(name) + " created");
+                                console.log("You can try installing modules manualy");
+                            });
+                            return [2 /*return*/];
+                    }
+                });
+            }); }).catch(function (err) {
+                spinner.fail('Failed to create project.');
+            });
+            return [2 /*return*/];
+        });
     });
 }
 function makeModel(name, cmd) {
@@ -95,27 +149,34 @@ function makeModel(name, cmd) {
             switch (_a.label) {
                 case 0:
                     type = 'model';
+                    return [4 /*yield*/, main_1.isTypesqueProject()];
+                case 1:
+                    if (!(_a.sent())) {
+                        console.error(chalk_1.default.bgRed(" ERROR ") + " Make sure you are inside a Typesque project to run the make:model command");
+                        return [2 /*return*/];
+                    }
+                    ;
                     if (!main_1.isAcceptedName(name, type))
                         return [2 /*return*/];
                     name = main_1.getFormattedName(name, cmd, type);
                     templateFile = path.join(__dirname, '..', 'templates', type + ".tsq");
                     destinationFile = path.join(process.cwd(), 'src', 'app', "" + pluralize_1.default(type), name + ".ts");
                     return [4 /*yield*/, main_1.destinationExists(destinationFile)];
-                case 1:
+                case 2:
                     if (_a.sent())
                         return [2 /*return*/];
                     tableName = name.split(/(?=[A-Z])|\-/g);
                     tableName[tableName.length - 1] = pluralize_1.default(tableName[tableName.length - 1]);
                     tableName = tableName.join('_').toLowerCase();
                     return [4 /*yield*/, fs_extra_1.default.readFile(templateFile, 'utf-8')];
-                case 2:
+                case 3:
                     template = _a.sent();
                     template = template.replace(/\$\$modelName\$\$/g, name);
                     template = template.replace(/\$\$tableName\$\$/g, tableName);
                     return [4 /*yield*/, fs_extra_1.default.writeFile(destinationFile, template)];
-                case 3:
+                case 4:
                     _a.sent();
-                    console.log(chalk_1.default.green('🗸 Created ' + type + ':') + " " + name + " ");
+                    console.log(chalk_1.default.green('√ Created ' + type + ':') + " " + name + " ");
                     return [2 /*return*/];
             }
         });
@@ -128,23 +189,30 @@ function makeController(name, cmd) {
             switch (_a.label) {
                 case 0:
                     type = 'controller';
+                    return [4 /*yield*/, main_1.isTypesqueProject()];
+                case 1:
+                    if (!(_a.sent())) {
+                        console.error(chalk_1.default.bgRed(" ERROR ") + " Make sure you are inside a Typesque project to run the make:controller command");
+                        return [2 /*return*/];
+                    }
+                    ;
                     if (!main_1.isAcceptedName(name, type))
                         return [2 /*return*/];
                     name = main_1.getFormattedName(name, cmd, type, true);
                     templateFile = path.join(__dirname, '..', 'templates', type + ".tsq");
                     destinationFile = path.join(process.cwd(), 'src', 'app', "" + pluralize_1.default(type), name + ".ts");
                     return [4 /*yield*/, main_1.destinationExists(destinationFile)];
-                case 1:
+                case 2:
                     if (_a.sent())
                         return [2 /*return*/];
                     return [4 /*yield*/, fs_extra_1.default.readFile(templateFile, 'utf-8')];
-                case 2:
+                case 3:
                     template = _a.sent();
                     template = template.replace(/\$\$controllerName\$\$/g, name);
                     return [4 /*yield*/, fs_extra_1.default.writeFile(destinationFile, template)];
-                case 3:
+                case 4:
                     _a.sent();
-                    console.log(chalk_1.default.green('🗸 Created ' + type + ':') + " " + name + " ");
+                    console.log(chalk_1.default.green('√ Created ' + type + ':') + " " + name + " ");
                     return [2 /*return*/];
             }
         });
@@ -157,6 +225,13 @@ function makeMiddleware(name, cmd) {
             switch (_a.label) {
                 case 0:
                     type = 'middleware';
+                    return [4 /*yield*/, main_1.isTypesqueProject()];
+                case 1:
+                    if (!(_a.sent())) {
+                        console.error(chalk_1.default.bgRed(" ERROR ") + " Make sure you are inside a Typesque project to run the make:middleware command");
+                        return [2 /*return*/];
+                    }
+                    ;
                     if (!main_1.isAcceptedName(name, type))
                         return [2 /*return*/];
                     name = main_1.getFormattedName(name, cmd, type);
@@ -164,17 +239,17 @@ function makeMiddleware(name, cmd) {
                     templateFile = path.join(__dirname, '..', 'templates', type + ".tsq");
                     destinationFile = path.join(process.cwd(), 'src', 'app', "" + pluralize_1.default(type), name + ".ts");
                     return [4 /*yield*/, main_1.destinationExists(destinationFile)];
-                case 1:
+                case 2:
                     if (_a.sent())
                         return [2 /*return*/];
                     return [4 /*yield*/, fs_extra_1.default.readFile(templateFile, 'utf-8')];
-                case 2:
+                case 3:
                     template = _a.sent();
                     template = template.replace(/\$\$middlewareName\$\$/g, name);
                     return [4 /*yield*/, fs_extra_1.default.writeFile(destinationFile, template)];
-                case 3:
+                case 4:
                     _a.sent();
-                    console.log(chalk_1.default.green('🗸 Created ' + type + ':') + " " + name + " ");
+                    console.log(chalk_1.default.green('√ Created ' + type + ':') + " " + name + " ");
                     return [2 /*return*/];
             }
         });
@@ -182,4 +257,21 @@ function makeMiddleware(name, cmd) {
 }
 function makeEHandler(name, cmd) {
     console.log('My e handler:' + name);
+}
+function serve(name, cmd) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, main_1.isTypesqueProject()];
+                case 1:
+                    if (!(_a.sent())) {
+                        console.error(chalk_1.default.bgRed(" ERROR ") + " Make sure you are inside a Typesque project to run the serve command");
+                        return [2 /*return*/];
+                    }
+                    ;
+                    console.log("Feature will be available soon use " + chalk_1.default.blue("npm run start:dev") + " or " + chalk_1.default.blue("npm run start") + " instead");
+                    return [2 /*return*/];
+            }
+        });
+    });
 }

@@ -6,23 +6,25 @@ import * as  path from 'path';
 import chalk from 'chalk';
 import fs from 'fs-extra';
 import { isAcceptedName, getFormattedName, destinationExists, isTypesqueProject } from '../main';
-const ora = require('ora');
+import  ora from 'ora';
+import npm from 'npm-programmatic';
 
 
-  program
+program
   .version('0.1.0', '-v --version')
   .description('A node framework on top of express with superpowers')
 
-  program
+program
   .command('new <name>')
   .description('Create a new typesque project')
   .action(newProject)
 
-  program
+program
   .command('make:model <name>')
   .description('Make a model')
   .option('-p --plural', 'Make the name plural')
   .action(makeModel)
+  
   program
   .command('make:controller <name>')
   .description('Make a controller')
@@ -34,23 +36,50 @@ const ora = require('ora');
   .description('Make a middleware')
   .action(makeMiddleware)
 
+  program
+  .command('serve')
+  .description('Serve project')
+  .option('-d --dev', 'Serve dev version')
+  .action(serve)
 /*   program
   .command('make:ehandler <name>')
   .action(makeEHandler) */
  
 program.parse(process.argv)
 
-function newProject(name: string, cmd: any){
+async function newProject(name: string, cmd: any){
     name = getFormattedName(name, cmd);
     let projectName: any = name.split(/(?=[A-Z])|\-/g);
-    projectName[projectName.length -1] = pluralize(projectName[projectName.length-1]);
-    name = projectName.join('_').toLowerCase();
+    projectName[projectName.length -1] = projectName[projectName.length-1];
+    name = projectName.join('-').toLowerCase();
     const git = require('simple-git/promise')(process.cwd()).silent(true);
-    const spinner = ora('Creating project').start('Cloning project blueprint');
-    git.clone('https://github.com/mordeccai/sequelize-typescript-api-starter.git', name).then(()=> {
-        spinner.succeed(`Project ${chalk.green(name)} created successfully`)
+    const spinner = ora('Creating project').start('Generating project blueprint');
+    git.clone('https://github.com/mordeccai/sequelize-typescript-api-starter.git', name).then(async ()=> {
+        await fs.remove(path.join(process.cwd(), name, '.git'));
+        spinner.start("Configuring project")
+        let packageJsonFilePath = path.join(process.cwd(), name, 'package.json');
+        let packageJSON = JSON.parse(await fs.readFile(packageJsonFilePath, 'utf-8'))
+        packageJSON["name"] = name;
+        spinner.start("Copying "+ chalk.blue(".env")+ " file");
+        await fs.copy(path.join(process.cwd(), name, '.env.example'), path.join(process.cwd(), name, '.env'))
+        await fs.writeFile(packageJsonFilePath, JSON.stringify(packageJSON, null, 4));
+        spinner.start("Installing project packages")
+        npm.install([''], {
+            cwd: path.join(process.cwd(), name),
+            save:true
+        })
+        .then(function(){
+            spinner.succeed("Packages installed successfuly");
+            spinner.succeed(`Project ${chalk.green(name)} created successfully`)
+            console.log(`Development (With watch) ${chalk.blue("npm run start:dev")} \nProd (Without watch) ${chalk.blue("npm run start")} instead`)
+        })
+        .catch(function(){
+            spinner.fail("Unable to install packages");
+            spinner.succeed(`Project ${chalk.green(name)} created`)
+            console.log("You can try installing modules manualy")
+        });
     }).catch((err: any)=>{
-        spinner.fail('Failed to load clone the project. Please check your connection');
+        spinner.fail('Failed to create project.');
     }); 
 }
 
@@ -112,4 +141,13 @@ async function makeMiddleware(name:string, cmd:any){
 
 function makeEHandler(name: string, cmd:any){
   console.log('My e handler:'+ name)
+}
+
+
+async function serve(name: string, cmd:any){
+    if(!await isTypesqueProject()){
+        console.error(`${chalk.bgRed(" ERROR ")} Make sure you are inside a Typesque project to run the serve command`);
+        return;
+    };
+    console.log(`Feature will be available soon use ${chalk.blue("npm run start:dev")} or ${chalk.blue("npm run start")} instead`)
 }
