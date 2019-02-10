@@ -7,13 +7,13 @@ This repo contains the core modules for the Typesque framework.
 <br />
 
 [![NPM Version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Appveyor][appveyor-image]][appveyor-url]
+[![Coveralls][coveralls-image]][coveralls-url]
+[![FOSSA Status][fossa-image]][fossa-url]
+[![Pr's Welcome][pr-welcoming-image]][pr-welcoming-url]
 
 <img src="typesque_logo.png" width="200px" align="right" hspace="30px" vspace="140px">
-
-## What's in the box?
-
-Typesque is a framework with cli.
-
 
 ## Node/OS Target
 
@@ -21,18 +21,11 @@ This repo/branch is supposed to run fine on all major OS platforms and targets `
 
 ## Cli Commands
 
-You can either use `typesque` or `tsq`. I'll use the 
-Create a new project `tsq new project-name`
-Create a controller `tsq make:controller home-controller` or even shorter `tsq make:controller home`
-Create a model `tsq make:model home`
-Create a middleware `tsq make:middleware is-home`
+You can either use `typesque` or `tsq` to access the cli
 
-## Development
+1. Create a new project `tsq new project-name`
 
-Great! If you are planning to contribute to the framework, make sure to adhere to following conventions, since a consistent code-base is always joy to work with.
+2. Create a controller `tsq make:controller home-controller` or even shorter `tsq make:controller home`
 
-Run the following command to see list of available npm scripts.
-
-```
-npm run
-```
+3. Create a model `tsq make:model home`
+4. Create a middleware `tsq make:middleware is-home`
