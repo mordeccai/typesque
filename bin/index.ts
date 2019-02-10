@@ -71,7 +71,8 @@ async function newProject(name: string, cmd: any){
         .then(function(){
             spinner.succeed("Packages installed successfuly");
             spinner.succeed(`Project ${chalk.green(name)} created successfully`)
-            console.log(`Development (With watch) ${chalk.blue("npm run start:dev")} \nProd (Without watch) ${chalk.blue("npm run start")} instead`)
+            console.log(`Dev (With watch) ${chalk.blue("npm run start:dev")} \nProd (Without watch) ${chalk.blue("npm run start")}`)
+            console.log("Commands are subject to future changes");
         })
         .catch(function(){
             spinner.fail("Unable to install packages");
